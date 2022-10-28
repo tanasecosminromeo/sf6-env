@@ -1,0 +1,50 @@
+FROM php:8.1.12RC1-fpm-alpine3.16
+
+# Install Symfony 3 requirements
+RUN set -xe \
+# Update repository
+&& apk update \
+&& apk upgrade \
+
+# Fixed Intl version
+&& apk add --no-cache libintl icu icu-dev shadow sudo \
+&& docker-php-ext-install intl \
+&& apk del icu-dev \
+
+&& docker-php-ext-install opcache \
+
+# PDO
+&& docker-php-ext-install pdo \
+
+# PDO MySQL
+&& docker-php-ext-install pdo_mysql \
+
+&& apk add --update bash \
+
+&& adduser -D app
+
+# Clear
+RUN rm -rf /tmp/* /var/cache/apk/*
+# Set the WORKDIR to /code
+WORKDIR /code
+
+#RUN pecl install xdebug
+#RUN docker-php-ext-enable xdebug
+#COPY ./.docker/php/xdebug.ini $PHP_INI_DIR/conf.d/xdebug.ini
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer 
+
+RUN mkdir -p /home/app/.composer/cache && chmod 0777 /home/app/.composer/cache
+
+RUN echo post_max_size=60M >> /usr/local/etc/php/conf.d/app.ini \
+    && echo upload_max_filesize=60M >> /usr/local/etc/php/conf.d/app.ini \
+    && echo 'expose_php = off' >> /usr/local/etc/php/conf.d/app.ini
+
+# Set up the owner and run php-fpm
+
+ADD app.sh /usr/bin/app
+RUN chmod +x /usr/bin/app
+
+ADD entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]

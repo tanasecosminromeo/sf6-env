@@ -1,0 +1,15 @@
+/.env
+/.idea
+/public/bundles/
+/var/
+/vendor/
+composer.phar
+composer.lock
+.composer
+nginx.snippet
+###> symfony/framework-bundle ###
+/.env
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
