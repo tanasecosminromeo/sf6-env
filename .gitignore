@@ -19,3 +19,7 @@ nginx.snippet
 /phpunit.xml
 /.phpunit.cache/
 ###< phpunit/phpunit ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

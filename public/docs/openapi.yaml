@@ -19,6 +19,71 @@ paths:
       responses:
         default:
           description: ''
+  /api/user:
+    get:
+      tags:
+        - Users
+      operationId: get_api_user_list
+      responses:
+        default:
+          description: ''
+    post:
+      tags:
+        - Users
+      operationId: post_api_user_create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+                - email
+                - username
+                - password
+              properties:
+                name:
+                  type: string
+                  example: 'Cosmin Romeo TANASE'
+                email:
+                  type: string
+                  format: email
+                  example: cosmin@tanase.dev
+                username:
+                  type: string
+                  example: crtanase
+                password:
+                  type: string
+                  format: password
+                  example: mysecretpassword2025
+              type: object
+      responses:
+        '201':
+          description: 'User created successfully'
+          content:
+            application/json:
+              schema:
+                properties:
+                  id: { type: integer, example: 1 }
+                  name: { type: string, example: crtanase }
+                  email: { type: string, format: email, example: cosmin@tanase.dev }
+                type: object
+        '400':
+          description: 'Missing required fields'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Missing required fields' }
+                type: object
+        '500':
+          description: 'Failed to create user'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Failed to create user' }
+                type: object
 components:
   examples:
     UserExample:
