@@ -1,0 +1,33 @@
+openapi: 3.0.0
+info:
+  title: 'Symfony 6 RESTApi'
+  description: 'Example to show how OpenAPI works in SF'
+  version: 1.0.0
+paths:
+  '/api/user/{id}':
+    get:
+      tags:
+        - Users
+      operationId: get_api_user_get
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+components:
+  examples:
+    UserExample:
+      summary: 'Example user'
+      value:
+        id: 1
+        name: 'Cosmin Romeo TANASE'
+        email: cosmin@tanase.dev
+tags:
+  -
+    name: Users
+

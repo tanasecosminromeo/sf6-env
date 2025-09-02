@@ -1,0 +1,17 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Symfony 6 RESTApi
+            description: Example to show how OpenAPI works in SF
+            version: 1.0.0
+        components:
+            examples:
+                UserExample:
+                    summary: Example user
+                    value:
+                        id: 1
+                        name: Cosmin Romeo TANASE
+                        email: cosmin@tanase.dev
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
