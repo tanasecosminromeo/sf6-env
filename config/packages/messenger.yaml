@@ -1,0 +1,21 @@
+framework:
+    messenger:
+        # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+        failure_transport: failed
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            async: 
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    auto_setup: true
+                    queue_name: 'sf6-messages-test'
+                    access_key: '%env(AWS_ACCESS_KEY)%'
+                    secret_key: '%env(AWS_SECRET_KEY)%'
+                    region: '%env(AWS_REGION)%'
+            failed: 'doctrine://default?queue_name=failed'
+            # sync: 'sync://'
+
+        routing:
+            # Route your messages to the transports
+            'App\Message\*': async

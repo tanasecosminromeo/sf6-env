@@ -19,4 +19,11 @@ sed -i -e "s/pm.min_spare_servers = 1/pm.min_spare_servers = ${FPM_MIN_SPARE:-1}
 sed -i -e "s/pm.max_spare_servers = 3/pm.max_spare_servers = ${FPM_MAX_SPARE:-3}/g" /usr/local/etc/php-fpm.d/www.conf
 sed -i -e "s/;pm.max_requests = 500/pm.max_requests = ${FPM_MAX_REQUESTS:-1000}/g" /usr/local/etc/php-fpm.d/www.conf
 
-php-fpm
+#if /code/var/log/supervisor/ doesn't exist, create it with 0777
+if [ ! -d "/code/var/log/supervisor/" ]; then
+    mkdir -p /code/var/log/supervisor/
+    chmod 0777 /code/var/log/supervisor/
+fi
+
+# Start supervisord which will manage PHP-FPM and Messenger consumers
+exec /usr/bin/supervisord -c /etc/supervisord.conf
