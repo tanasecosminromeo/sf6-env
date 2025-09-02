@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,12 +13,18 @@ use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api', name: 'api_')]
+
 final class UserController extends AbstractController
 {
     #[Route('/user/{id}', methods: ['GET'], name: 'user_get')]
     #[OA\Tag(name: 'Users')]
-    public function showUser(User $user): JsonResponse
+    #[Security(name: 'Bearer')]
+    public function showUser(?User $user): JsonResponse
     {
+        if (!$user){
+            return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
         // Fetch the user from the database (omitted for brevity)
         return $this->json([
             'id' => $user->getId(), 
@@ -98,6 +105,39 @@ final class UserController extends AbstractController
 
     #[Route('/user', methods: ['GET'], name: 'user_list')]
     #[OA\Tag(name: 'Users')]
+    #[OA\Parameter(
+        name: 'page',
+        in: 'query',
+        required: false,
+        description: 'Page number (default: 1)',
+        schema: new OA\Schema(type: 'integer', default: 1)
+    )]
+    #[OA\Parameter(
+        name: 'limit',
+        in: 'query',
+        required: false,
+        description: 'Number of users per page (default: 10, max: 100)',
+        schema: new OA\Schema(type: 'integer', default: 10, maximum: 100)
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'List of users',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'page', type: 'integer', example: 1),
+                new OA\Property(property: 'limit', type: 'integer', example: 10),
+                new OA\Property(property: 'total', type: 'integer', example: 100),
+                new OA\Property(property: 'users', type: 'array', items: new OA\Items(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(property: 'username', type: 'string', example: 'crtanase'),
+                        new OA\Property(property: 'email', type: 'string', format: 'email', example: 'cosmin@tanase.dev'),
+                    ]
+                ))
+            ]
+        )
+    )]
     public function listUsers(Request $request, EntityManagerInterface $em): JsonResponse
     {
         $page = max(1, (int)$request->query->get('page', 1));

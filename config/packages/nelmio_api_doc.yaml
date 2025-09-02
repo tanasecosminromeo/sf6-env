@@ -12,6 +12,56 @@ nelmio_api_doc:
                         id: 1
                         name: Cosmin Romeo TANASE
                         email: cosmin@tanase.dev
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+        paths:
+            /api/login_check:
+                post:
+                    tags: [Auth]
+                    summary: Obtain JWT token
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    required: [username, password]
+                                    properties:
+                                        username:
+                                            type: string
+                                            example: crtanase
+                                        password:
+                                            type: string
+                                            example: mysecretpassword2025
+                    responses:
+                        '200':
+                            description: JWT token response
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                        '401':
+                            description: Invalid credentials
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            code:
+                                                type: integer
+                                                example: 401
+                                            message:
+                                                type: string
+                                                example: Invalid credentials.
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc

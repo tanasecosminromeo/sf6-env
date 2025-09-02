@@ -4,6 +4,45 @@ info:
   description: 'Example to show how OpenAPI works in SF'
   version: 1.0.0
 paths:
+  /api/login_check:
+    post:
+      tags:
+        - Auth
+      summary: 'Obtain JWT token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: crtanase
+                password:
+                  type: string
+                  example: mysecretpassword2025
+              type: object
+      responses:
+        '200':
+          description: 'JWT token response'
+          content:
+            application/json:
+              schema:
+                properties:
+                  token: { type: string, example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... }
+                type: object
+        '401':
+          description: 'Invalid credentials'
+          content:
+            application/json:
+              schema:
+                properties:
+                  code: { type: integer, example: 401 }
+                  message: { type: string, example: 'Invalid credentials.' }
+                type: object
   '/api/user/{id}':
     get:
       tags:
@@ -19,14 +58,44 @@ paths:
       responses:
         default:
           description: ''
+      security:
+        -
+          Bearer: []
   /api/user:
     get:
       tags:
         - Users
       operationId: get_api_user_list
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'Page number (default: 1)'
+          required: false
+          schema:
+            type: integer
+            default: 1
+        -
+          name: limit
+          in: query
+          description: 'Number of users per page (default: 10, max: 100)'
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
       responses:
-        default:
-          description: ''
+        '200':
+          description: 'List of users'
+          content:
+            application/json:
+              schema:
+                properties:
+                  page: { type: integer, example: 1 }
+                  limit: { type: integer, example: 10 }
+                  total: { type: integer, example: 100 }
+                  users: { type: array, items: { properties: { id: { type: integer, example: 1 }, username: { type: string, example: crtanase }, email: { type: string, format: email, example: cosmin@tanase.dev } }, type: object } }
+                type: object
     post:
       tags:
         - Users
@@ -92,7 +161,18 @@ components:
         id: 1
         name: 'Cosmin Romeo TANASE'
         email: cosmin@tanase.dev
+  securitySchemes:
+    Bearer:
+      type: http
+      bearerFormat: JWT
+      scheme: bearer
+security:
+  -
+    Bearer: []
 tags:
   -
     name: Users
+  -
+    name: Auth
+    description: Auth
 
