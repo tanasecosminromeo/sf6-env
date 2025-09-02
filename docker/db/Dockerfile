@@ -1,14 +1,15 @@
-FROM percona:8.0.29-21-centos
-MAINTAINER Cosmin-Romeo TANASE <tanasecosminromeo@gmail.com>
+FROM percona:8.0.43-34
+LABEL maintainer="Cosmin-Romeo TANASE <cosmin@tanase.dev>"
 
 USER root
-RUN yum update \
-    && yum -y install epel-release \
-    && yum makecache --refresh --enablerepo="ol8_developer_EPEL" \
-    && yum -y install pv bc supervisor openssh-clients procps sudo \
-    && yum -y upgrade \
-    && yum clean all \
-    && rm -rf /var/cache/yum
+
+RUN curl -O https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+
+RUN rpm -ivh epel-release-latest-9.noarch.rpm
+
+RUN microdnf update -y \
+    && microdnf install -y bc supervisor openssh-clients procps sudo pv supervisor \
+    && microdnf clean all
 
 COPY percona.sh /usr/local/bin/percona
 RUN chmod +x /usr/local/bin/percona

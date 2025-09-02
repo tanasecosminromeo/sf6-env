@@ -1,4 +1,5 @@
-FROM php:8.1.12RC1-fpm-alpine3.16
+FROM php:8.4.12-fpm-alpine3.21
+LABEL maintainer="Cosmin-Romeo TANASE <cosmin@tanase.dev>"
 
 # Install Symfony 3 requirements
 RUN set -xe \
@@ -20,6 +21,9 @@ RUN set -xe \
 && docker-php-ext-install pdo_mysql \
 
 && apk add --update bash \
+
+# Add mariadb client
+&& apk add --no-cache mariadb-client \
 
 && adduser -D app
 
