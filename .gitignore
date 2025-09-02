@@ -7,6 +7,7 @@ composer.phar
 composer.lock
 .composer
 nginx.snippet
+.vscode/settings.json
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/
