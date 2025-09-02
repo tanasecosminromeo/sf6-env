@@ -5,6 +5,7 @@ import sys
 import time
 import llm_chains  # Change this from relative to absolute import
 import json
+import requests
 
 # AWS credentials handled explicitly
 SQS_QUEUE_URL = os.getenv("MESSENGER_TRANSPORT_DSN")            
@@ -67,6 +68,15 @@ def consume_sqs():
 
                         if generated_query:
                             print(f"Generated Google Query: {generated_query}")
+
+                            generated_object = json.loads(generated_query)
+
+                            #send a request to http://web/geocoding?location={generated_query['location']}
+                            response = requests.get(f"http://web/geocoding?location={generated_object['location']}")
+                            if response.status_code == 200:
+                                print(f"Geocoding API response: {response.json()}")
+                            else:
+                                print(f"Error calling Geocoding API: {response.status_code}")
                         else:
                             print("Could not generate a valid query.")
                         
