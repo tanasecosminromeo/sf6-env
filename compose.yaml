@@ -1,6 +1,6 @@
 services:
   web:
-    hostname: app-web
+    hostname: web
     image: nginx:latest
     env_file:
       - .env
@@ -14,7 +14,7 @@ services:
         ipv4_address: ${IP_SUBNET}.101
 
   db:
-    hostname: app-db
+    hostname: db
     env_file:
       - .env
     build: ./docker/db
@@ -26,7 +26,7 @@ services:
         ipv4_address: ${IP_SUBNET}.103
 
   app:
-    hostname: app-app
+    hostname: app
     env_file:
       - .env
     depends_on:
@@ -43,6 +43,23 @@ services:
     networks:
       mynet:
         ipv4_address: ${IP_SUBNET}.104
+
+  langchain:
+    hostname: langchain
+    env_file:
+      - .env
+    depends_on:
+      - app
+      - db 
+    image: tanasecosminromeo/langchain:latest
+    build:
+      context: ./docker/langchain
+    volumes:
+      - "./src/LangChain:/app"
+    restart: always
+    networks:
+      mynet:
+        ipv4_address: ${IP_SUBNET}.105
 
 volumes:
     db_data:

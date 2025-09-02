@@ -1,0 +1,4 @@
+langchain
+langchain_openai
+#langchain-google-community
+boto3

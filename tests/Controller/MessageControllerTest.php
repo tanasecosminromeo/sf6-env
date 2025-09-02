@@ -46,4 +46,31 @@ class MessageControllerTest extends WebTestCase
         // Verify that a message was dispatched to the transport
         $this->assertCount(1, $transport->getSent());
     }
+
+
+    public function testDispatchExampleEndpoint(): void
+    {
+                $client = static::createClient();
+        $token = $this->getJwtToken($client);
+        
+        // Make a request to the dispatch endpoint
+        $client->request('POST', '/api/messages/dispatch/example', [], [], ['HTTP_AUTHORIZATION' => 'Bearer ' . $token]);
+        
+        // Assert that the response is successful
+        $this->assertResponseIsSuccessful();
+        
+        // Verify the JSON response structure
+        $responseData = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('status', $responseData);
+        $this->assertEquals('Message dispatched successfully', $responseData['status']);
+        
+        // Get the transport from the container
+        $transport = static::getContainer()->get('messenger.transport.async');
+        
+        // Ensure it's the in-memory transport (in test environment)
+        $this->assertInstanceOf(InMemoryTransport::class, $transport);
+        
+        // Verify that a message was dispatched to the transport
+        $this->assertCount(1, $transport->getSent());
+    }
 }

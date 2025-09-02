@@ -1,6 +1,14 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - consumer
+    handlers:
+        consumer:
+            type: rotating_file
+            path: "%kernel.logs_dir%/consumer/%kernel.environment%.log"
+            level: debug
+            channels: ["consumer"]
+
 
 when@dev:
     monolog:
