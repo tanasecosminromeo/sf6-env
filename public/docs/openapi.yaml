@@ -43,6 +43,143 @@ paths:
                   code: { type: integer, example: 401 }
                   message: { type: string, example: 'Invalid credentials.' }
                 type: object
+  /api/jobs/search:
+    get:
+      tags:
+        - Jobs
+      operationId: get_api_jobs_job_search
+      parameters:
+        -
+          name: query
+          in: query
+          description: 'The original query to search for'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Returns jobs matching the search query'
+          content:
+            application/json:
+              schema:
+                properties:
+                  total: { type: integer, example: 3 }
+                  query: { type: string, example: bucharest }
+                  jobs: { type: array, items: { properties: { id: { type: integer, example: 1 }, original_query: { type: string, example: 'Where is Bucharest?' }, location: { type: string, example: Bucharest }, query: { type: string, example: 'Bucharest coordinates' }, result: { type: object }, messageId: { type: string }, createdAt: { type: string, format: date-time }, sentAt: { type: string, format: date-time }, resolvedAt: { type: string, format: date-time } }, type: object } }
+                type: object
+        '400':
+          description: 'Missing query parameter'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Missing query parameter' }
+                type: object
+      security:
+        -
+          Bearer: []
+  /api/jobs:
+    get:
+      tags:
+        - Jobs
+      operationId: get_api_jobs_job_list
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'Page number (default: 1)'
+          required: false
+          schema:
+            type: integer
+            default: 1
+        -
+          name: limit
+          in: query
+          description: 'Number of jobs per page (default: 10, max: 100)'
+          required: false
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+        -
+          name: sort
+          in: query
+          description: 'Sort field (default: id)'
+          required: false
+          schema:
+            type: string
+            default: id
+            enum:
+              - id
+              - createdAt
+              - resolvedAt
+        -
+          name: order
+          in: query
+          description: 'Sort order (default: DESC)'
+          required: false
+          schema:
+            type: string
+            default: DESC
+            enum:
+              - ASC
+              - DESC
+      responses:
+        '200':
+          description: 'List of jobs'
+          content:
+            application/json:
+              schema:
+                properties:
+                  page: { type: integer, example: 1 }
+                  limit: { type: integer, example: 10 }
+                  total: { type: integer, example: 100 }
+                  jobs: { type: array, items: { properties: { id: { type: integer, example: 1 }, original_query: { type: string, example: 'Where is Bucharest?' }, location: { type: string, example: Bucharest }, result: { type: object, example: { place_id: ChIJKRjik9r_rUARIP-zcCwWpkI, description: 'Bucharest, Romania', lat: 44.4267674, lng: 26.1025384 } }, createdAt: { type: string, format: date-time, example: '2025-09-03T08:15:30+00:00' } }, type: object } }
+                type: object
+      security:
+        -
+          Bearer: []
+  '/api/jobs/{id}':
+    get:
+      tags:
+        - Jobs
+      operationId: get_api_jobs_job_get
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'The job ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Returns job details'
+          content:
+            application/json:
+              schema:
+                properties:
+                  id: { type: integer, example: 1 }
+                  original_query: { type: string, example: 'Where is Bucharest?' }
+                  location: { type: string, example: Bucharest }
+                  query: { type: string, example: 'Bucharest coordinates' }
+                  result: { type: object, example: { place_id: ChIJKRjik9r_rUARIP-zcCwWpkI, description: 'Bucharest, Romania', lat: 44.4267674, lng: 26.1025384, fresh: false } }
+                  messageId: { type: string, example: 96b91f3e-c9a5-4e35-97a7-c59e22326b04 }
+                  createdAt: { type: string, format: date-time, example: '2025-09-03T08:15:30+00:00' }
+                  sentAt: { type: string, format: date-time, example: '2025-09-03T08:15:28+00:00' }
+                  resolvedAt: { type: string, format: date-time, example: '2025-09-03T08:15:35+00:00' }
+                type: object
+        '404':
+          description: 'Job not found'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Job not found' }
+                type: object
+      security:
+        -
+          Bearer: []
   /api/messages/dispatch:
     post:
       tags:
@@ -121,24 +258,6 @@ paths:
                   status: { type: string, example: 'Message dispatched successfully' }
                   time: { type: string, format: date-time }
                 type: object
-  '/api/user/{id}':
-    get:
-      tags:
-        - Users
-      operationId: get_api_user_get
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        default:
-          description: ''
-      security:
-        -
-          Bearer: []
   /api/user:
     get:
       tags:
@@ -231,6 +350,24 @@ paths:
                 properties:
                   error: { type: string, example: 'Failed to create user' }
                 type: object
+  '/api/user/{id}':
+    get:
+      tags:
+        - Users
+      operationId: get_api_user_get
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        default:
+          description: ''
+      security:
+        -
+          Bearer: []
 components:
   examples:
     UserExample:
@@ -248,6 +385,8 @@ security:
   -
     Bearer: []
 tags:
+  -
+    name: Jobs
   -
     name: Message
   -

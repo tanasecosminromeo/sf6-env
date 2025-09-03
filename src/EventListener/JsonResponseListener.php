@@ -45,8 +45,10 @@ class JsonResponseListener implements EventSubscriberInterface
         $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
         if ($exception instanceof HttpExceptionInterface) {
             $statusCode = $exception->getStatusCode();
+        } elseif (strstr($exception->getMessage(), 'Access Denied')) {
+            $statusCode = Response::HTTP_UNAUTHORIZED;
         }
-        
+
         // Create response data
         $responseData = [
             'status' => 'error',
