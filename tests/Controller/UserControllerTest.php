@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class UserControllerTest extends WebTestCase
@@ -79,6 +80,17 @@ final class UserControllerTest extends WebTestCase
         $this->assertArrayHasKey('id', $responseData);
         $this->assertArrayHasKey('name', $responseData);
         $this->assertArrayHasKey('email', $responseData);
+
+        // cleanup
+        $userId = $responseData['id'];
+
+        $em = $client->getContainer()->get('doctrine')->getManager();
+        $user = $em->getRepository(User::class)->find($userId);
+
+        $this->assertNotNull($user);
+        
+        $em->remove($user);
+        $em->flush();
     }
     
     public function testListUsers(): void

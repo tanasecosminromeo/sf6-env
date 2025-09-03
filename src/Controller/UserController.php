@@ -13,28 +13,10 @@ use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api', name: 'api_')]
-
+#[OA\Tag(name: 'Users')]
 final class UserController extends AbstractController
 {
-    #[Route('/user/{id}', methods: ['GET'], name: 'user_get')]
-    #[OA\Tag(name: 'Users')]
-    #[Security(name: 'Bearer')]
-    public function showUser(?User $user): JsonResponse
-    {
-        if (!$user){
-            return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        // Fetch the user from the database (omitted for brevity)
-        return $this->json([
-            'id' => $user->getId(), 
-            'name' => $user->getName(),
-            'email' => $user->getEmail(),
-        ]);
-    }
-
     #[Route('/user', methods: ['POST'], name: 'user_create')]
-    #[OA\Tag(name: 'Users')]
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
@@ -104,7 +86,6 @@ final class UserController extends AbstractController
 
 
     #[Route('/user', methods: ['GET'], name: 'user_list')]
-    #[OA\Tag(name: 'Users')]
     #[OA\Parameter(
         name: 'page',
         in: 'query',
@@ -161,6 +142,22 @@ final class UserController extends AbstractController
             'limit' => $limit,
             'total' => $total,
             'users' => $data,
+        ]);
+    }
+
+    #[Route('/user/{id}', methods: ['GET'], name: 'user_get')]
+    #[Security(name: 'Bearer')]
+    public function showUser(?User $user): JsonResponse
+    {
+        if (!$user){
+            return $this->json(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Fetch the user from the database (omitted for brevity)
+        return $this->json([
+            'id' => $user->getId(), 
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
         ]);
     }
 }
