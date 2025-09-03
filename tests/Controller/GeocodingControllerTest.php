@@ -9,7 +9,7 @@ final class GeocodingControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/geocoding');
+        $client->request('GET', '/geocoding', ['location'=>'Slobozia']);
 
         self::assertResponseIsSuccessful();
     }

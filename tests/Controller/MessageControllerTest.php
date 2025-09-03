@@ -25,10 +25,14 @@ class MessageControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $token = $this->getJwtToken($client);
-        
+
+        $possibleQueries = ['Where is Slobozia located at?', 'Where is Vilnius located in?', 'McDonals in Bragadiru is at what address?'];
+
+        $query = $possibleQueries[array_rand($possibleQueries)];
+
         // Make a request to the dispatch endpoint
-        $client->request('POST', '/api/messages/dispatch', [], [], ['HTTP_AUTHORIZATION' => 'Bearer ' . $token]);
-        
+        $client->request('POST', '/api/messages/dispatch', ['query' => $query], [], ['HTTP_AUTHORIZATION' => 'Bearer ' . $token], json_encode(['query' => $query]));
+
         // Assert that the response is successful
         $this->assertResponseIsSuccessful();
         

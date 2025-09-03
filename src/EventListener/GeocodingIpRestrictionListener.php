@@ -11,12 +11,14 @@ use Psr\Log\LoggerInterface;
 
 class GeocodingIpRestrictionListener implements EventSubscriberInterface
 {
-    private const ALLOWED_IP = '200.101.14.105';
     private LoggerInterface $logger;
+
+    private string $ip_subnet_prefix = '';
 
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
+        $this->ip_subnet_prefix = getenv("IP_SUBNET");
     }
 
     public static function getSubscribedEvents(): array
@@ -40,14 +42,17 @@ class GeocodingIpRestrictionListener implements EventSubscriberInterface
             $request = $event->getRequest();
             $clientIp = $request->getClientIp();
 
-            if ($clientIp !== self::ALLOWED_IP) {
+            $allowedIps = array_map(fn ($suffix) => $this->ip_subnet_prefix . '.' . $suffix, ['104', '105']);
+            $allowedIps[] = '127.0.0.1';
+
+            if (!in_array($clientIp, $allowedIps, true)) {
                 $this->logger->warning('Unauthorized access attempt to GeocodingController', [
                     'ip' => $clientIp,
-                    'allowed_ip' => self::ALLOWED_IP,
+                    'allowed_prefix' => $this->ip_subnet_prefix,
                     'path' => $request->getPathInfo()
                 ]);
 
-                throw new AccessDeniedHttpException('Access denied: Your IP is not allowed to access this resource.');
+                throw new AccessDeniedHttpException('Access denied: Your IP is not allowed to access this resource.'.$clientIp);
             }
 
             $this->logger->info('Authorized access to GeocodingController', [

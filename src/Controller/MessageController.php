@@ -21,11 +21,19 @@ class MessageController extends AbstractController
     #[OA\RequestBody(
         required: true,
         description: 'Dispatch a question to our LangChain agent',
-        content: new OA\JsonContent(
-            required: ['query'],
-            properties: [
-                new OA\Property(property: 'query', type: 'string', example: 'Where is Bucharest located on the globe')
-            ]
+        content: new OA\MediaType(
+            mediaType: 'application/x-www-form-urlencoded',
+            schema: new OA\Schema(
+                required: ['query'],
+                properties: [
+                    new OA\Property(
+                        property: 'query', 
+                        type: 'string', 
+                        example: 'Where is Bucharest located on the globe',
+                        minLength: 2
+                    )
+                ]
+            )
         )
     )]
     #[OA\Response(
@@ -43,8 +51,8 @@ class MessageController extends AbstractController
     {
         $query = $request->request->get('query');
 
-        if (!$query) {
-            return $this->json(['error' => 'Query parameter is missing'], 400);
+        if (!$query || strlen($query) < 2){
+            return $this->json(['error' => 'Query parameter is missing or too short'], 400);
         }
 
         $message = new AgentMessage($query);
