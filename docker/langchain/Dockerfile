@@ -11,6 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install watchgod for hot reloading
 RUN pip install --no-cache-dir watchgod
 
+ENV PYTHONUNBUFFERED=1
+
 # Command to run the script when the container starts
 # Run agent.py directly without using watchgod
 CMD ["python", "agent.py"]

@@ -50,7 +50,7 @@ def create_full_chain():
     Creates a single, unified chain for extraction, validation, and query generation.
     """
     llm = get_llm()
-    
+
     # Define individual prompt-based chains as before
     extract_message_chain = (
         PromptTemplate.from_template(
@@ -65,8 +65,11 @@ def create_full_chain():
 
     extract_location_chain = (
         PromptTemplate.from_template(
-            "You are a helpful assistant that only extracts location names from user questions. "
-            "Your only goal is to identify a town, city, country, or specific landmark. "
+            "You are an expert at extracting location names from user questions. "
+            "Your goal is to identify and return the most specific place mentioned. "
+            "This can be a town, city, country, a specific landmark, or a business name. "
+            "If a specific business or landmark is mentioned, such as 'McDonald's in Bragadiru' or 'Zara in Bucharest', "
+            "return the full, specific name. "
             "If the question does not contain a location, return 'None'. "
             "Do not return any other text or explanation.\n\n"
             "Question: \"{message}\"\nLocation:"
@@ -77,7 +80,7 @@ def create_full_chain():
 
     validate_location_chain = (
         PromptTemplate.from_template(
-            "Is the following text a valid town, city, country, or location? "
+            "Is the following text a valid town, city, country, or location/place/specific landmark or business name? "
             "Respond with 'Yes' or 'No' and nothing else.\n\n"
             "Text: \"{location}\"\nResponse:"
         )
@@ -87,7 +90,7 @@ def create_full_chain():
 
     generate_query_chain = (
         PromptTemplate.from_template(
-            "Generate a concise Google search query for the coordinates of {location}. "
+            "Generate a concise Google search query for the coordinates of {location} - which can be a town, city, country, specific landmark, or business name. "
             "The query should be formatted as a json with the location for which we need the coordinates and the original query. Do not format the response with markdown, just return a clear trimmed json.\n\nQuery:"
         )
         | llm
@@ -127,7 +130,7 @@ def create_full_chain():
                 })
                 if x["is_valid"]
                 else json.dumps({
-                    "error": "Validation failed: Location is not valid.",
+                    "error": f"Validation failed: Location is not valid {x['location']}. ",
                     "original_message": x["extracted_message"]
                 })
             )
