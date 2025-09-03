@@ -56,6 +56,9 @@ def consume_sqs():
                         # Now you can access it as a dictionary
                         if unserialized_message.get('type') == 0:  # TO_LLM
                             print("Processing LLM Message")
+                            #show MessageId and SentTimestamp
+                            print(f"MessageId: {message['MessageId']}")
+                            print(f"SentTimestamp: {message['Attributes']['SentTimestamp']}")
                         else:
                             print("Not a LLM Message")
                             continue
@@ -72,11 +75,22 @@ def consume_sqs():
                             generated_object = json.loads(generated_query)
 
                             #send a request to http://web/geocoding?location={generated_query['location']}
-                            response = requests.get(f"http://web/geocoding?location={generated_object['location']}")
+                            response = requests.post(
+                                "http://web/geocoding",
+                                data={
+                                    'location': generated_object['location'],
+                                    'query': generated_object['query'],
+                                    'original_message': generated_object['original_message'],
+                                    'messageId': message['MessageId'],
+                                    'sentAt': message['Attributes']['SentTimestamp']
+                                },
+                                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                            )
+
                             if response.status_code == 200:
                                 print(f"Geocoding API response: {response.json()}")
                             else:
-                                print(f"Error calling Geocoding API: {response.status_code}")
+                                print(f"Error calling Geocoding API: {response.status_code}, {response.json()}")
                         else:
                             print("Could not generate a valid query.")
                         

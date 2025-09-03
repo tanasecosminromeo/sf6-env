@@ -64,13 +64,35 @@ paths:
               type: object
       responses:
         '200':
-          description: 'Message dispatched successfully'
+          description: 'Message already processed (existing job found)'
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: { type: string, example: 'Message already processed' }
+                  query: { type: string, example: 'Where is Bucharest located on the globe' }
+                  result: { type: object, example: { place_id: ChIJKRjik9r_rUARIP-zcCwWpkI, description: 'Bucharest, Romania', lat: 44.4267674, lng: 26.1025384, fresh: false } }
+                  time: { type: string, format: date-time, example: '2025-09-03T08:15:30+00:00' }
+                  jobTime: { type: string, format: date-time, example: '2025-09-03T08:15:30+00:00' }
+                type: object
+        '201':
+          description: 'Message dispatched successfully (new job created)'
           content:
             application/json:
               schema:
                 properties:
                   status: { type: string, example: 'Message dispatched successfully' }
-                  time: { type: string, format: date-time }
+                  query: { type: string, example: 'Where is Bucharest located on the globe' }
+                  time: { type: string, format: date-time, example: '2025-09-03T08:15:30+00:00' }
+                  jobTime: { type: string, format: date-time, example: '2025-09-03T08:15:30+00:00' }
+                type: object
+        '400':
+          description: 'Invalid input'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Query parameter is missing or too short' }
                 type: object
   /api/messages/dispatch/example:
     post:

@@ -20,7 +20,7 @@ class AgentMessage
 
     public function __toString()
     {
-        return sprintf('AgentMessage { content: %s, type: %d }', $this->content, $this->type);
+        return sprintf('AgentMessage { content: %s, type: %d }', $this->content, $this->getTypeName());
     }
 
     public function getContent(): string
@@ -31,5 +31,19 @@ class AgentMessage
     public function getType(): int
     {
         return $this->type;
+    }
+
+    static function getTypeNames(): array
+    {
+        return [
+            self::TO_LLM => 'TO_LLM',
+            self::TO_GOOGLE => 'TO_GOOGLE',
+            self::TO_STORAGE => 'TO_STORAGE',
+        ];
+    }
+
+    public function getTypeName(): string
+    {
+        return self::getTypeNames()[$this->type] ?? 'unknown';
     }
 }
